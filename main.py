@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 from gtts import gTTS
 import spacy
+from spacy.cli import download
 
 # Function to parse .flashquiz file and extract FrontText and BackText
 def flashquiz_to_table(file_obj):
@@ -50,8 +51,12 @@ def generate_audio(text):
     tts.save(audio_file)
     return audio_file
 
-# Load the German language model
-nlp = spacy.load("de_core_news_sm")
+# Load the German language mode
+try:
+    nlp = spacy.load("de_core_news_sm")
+except OSError:
+    download("de_core_news_sm")
+    nlp = spacy.load("de_core_news_sm")
 
 @st.cache_data
 def get_noun_articles(sentence):
