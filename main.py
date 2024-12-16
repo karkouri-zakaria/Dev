@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import streamlit as st
 from gtts import gTTS
-import os
+import spacy
 
 # Function to parse .flashquiz file and extract FrontText and BackText
 def flashquiz_to_table(file_obj):
@@ -50,6 +50,16 @@ def generate_audio(text):
     tts.save(audio_file)
     return audio_file
 
+# Load the German language model
+nlp = spacy.load("de_core_news_sm")
+
+@st.cache_data
+def get_noun_articles(sentence):
+    doc = nlp(sentence)
+    articles = {"Fem": "die", "Masc": "der", "Neut": "das"}
+    return [(token.text, articles.get(token.morph.get("Gender")[0], "Unknown")) 
+            for token in doc if token.pos_ == "NOUN"]
+
 # Streamlit app
 st.set_page_config(layout="wide")
 st.title('Flashquiz Viewer By Zakaria')
@@ -84,7 +94,7 @@ if uploaded_file is not None:
 
         # Create a grid of flashcards
         num_columns = 4
-
+        st.write(f"Number of flashcards: {len(flashcards_df)}")
         rows = [flashcards_df.iloc[i:i + num_columns] for i in range(0, len(flashcards_df), num_columns)]
 
         for row in rows:
@@ -95,6 +105,9 @@ if uploaded_file is not None:
 
                     with st.expander("Deutsch⚫🔴🟡"):
                         st.write(flashcard['BackText'])
+                        
+                        for article, noun in get_noun_articles(flashcard['BackText']):
+                            print(f"{article} {noun}")
                         try:
                             audio_path = generate_audio(flashcard['BackText'])  # This will cache audio
                             with open(audio_path, "rb") as audio_file:
