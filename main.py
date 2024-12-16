@@ -52,7 +52,7 @@ def generate_audio(text):
 
 # Streamlit app
 st.set_page_config(layout="wide")
-st.title('Flashquiz Viewer')
+st.title('Flashquiz Viewer By Zakaria')
 
 # Sidebar to display the user input
 user_note = st.sidebar.text_area("Write something", "", key="user_input")
@@ -83,10 +83,7 @@ if uploaded_file is not None:
         st.write("### Extracted Flashcards")
 
         # Create a grid of flashcards
-        st.sidebar.write("Number of cards per line:")
-        num_columns = st.sidebar.number_input("Search Flashcards", min_value=1, value=4)  # Default value set to 4
-
-        st.write(f"Number of columns: {num_columns}")
+        num_columns = 4
 
         rows = [flashcards_df.iloc[i:i + num_columns] for i in range(0, len(flashcards_df), num_columns)]
 
