@@ -4,6 +4,7 @@ import streamlit as st
 from gtts import gTTS
 import spacy
 import hashlib
+import os
 
 # Move st.set_page_config to the very top
 st.set_page_config(layout="wide")
@@ -46,14 +47,20 @@ def flashquiz_to_table(file_obj):
 
     return df
 
+# Ensure the cache directory exists
+if not os.path.exists("cache"): os.makedirs("cache")
+
 # Function to generate audio from text using gTTS
 @st.cache_data
-def generate_audio(text, file_name="audio.mp3"):
+def generate_audio(text):
     # Create a unique hash for the text to avoid re-generation
-    text_hash = hashlib.md5(text.encode()).hexdigest()  # Generate a hash from the text
-    audio_file = f"audio_{text_hash}.mp3"  # Save the file with the hash as the filename
-    tts = gTTS(text=text, lang='de')  # German language
-    tts.save(audio_file)
+    audio_file = os.path.join("cache", f"audio_{hashlib.md5(text.encode()).hexdigest()}.mp3")  # Save the file with the hash as the filename
+    
+    # Check if the file already exists in the cache
+    if not os.path.exists(audio_file):
+        tts = gTTS(text=text, lang='de')  # German language
+        tts.save(audio_file)
+    
     return audio_file
 
 # Load the German language model
@@ -84,7 +91,7 @@ st.title('Flashquiz Viewer By Zakaria')
 user_note = st.sidebar.text_area("Write something", "", key="user_input")
 st.sidebar.write(user_note)
 if user_note:
-    audio_path = generate_audio(user_note, file_name="user_note_audio.mp3")
+    audio_path = generate_audio(user_note)
     with open(audio_path, "rb") as audio_file:
         audio_bytes = audio_file.read()
         st.sidebar.audio(audio_bytes, format="audio/mp3")
