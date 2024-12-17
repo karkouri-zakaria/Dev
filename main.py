@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 from gtts import gTTS
 import spacy
+import hashlib
 
 # Move st.set_page_config to the very top
 st.set_page_config(layout="wide")
@@ -48,8 +49,10 @@ def flashquiz_to_table(file_obj):
 # Function to generate audio from text using gTTS
 @st.cache_data
 def generate_audio(text, file_name="audio.mp3"):
+    # Create a unique hash for the text to avoid re-generation
+    text_hash = hashlib.md5(text.encode()).hexdigest()  # Generate a hash from the text
+    audio_file = f"audio_{text_hash}.mp3"  # Save the file with the hash as the filename
     tts = gTTS(text=text, lang='de')  # German language
-    audio_file = file_name  # Overwrite the same file
     tts.save(audio_file)
     return audio_file
 
