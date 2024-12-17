@@ -6,8 +6,7 @@ import spacy
 import subprocess
 
 # Run the command to download the spaCy model
-subprocess.run(["python", "-m", "spacy", "download", "de-core-news-sm"], check=True)
-
+subprocess.run(["sudo", "python", "-m", "spacy", "download", "de-core-news-sm"], check=True)
 
 # Function to parse .flashquiz file and extract FrontText and BackText
 def flashquiz_to_table(file_obj):
