@@ -3,10 +3,6 @@ import pandas as pd
 import streamlit as st
 from gtts import gTTS
 import spacy
-import subprocess
-
-# Run the command to download the spaCy model
-subprocess.run(["sudo", "python", "-m", "spacy", "download", "de-core-news-sm"], check=True)
 
 # Function to parse .flashquiz file and extract FrontText and BackText
 def flashquiz_to_table(file_obj):
@@ -56,7 +52,7 @@ def generate_audio(text, file_name="audio.mp3"):
 
 # Load the German language mode
 try:
-    nlp = spacy.load("de_core_news_sm")
+    spacy.load("de_core_news_sm")
 except OSError:
     st.error("Please restart the app to load the spaCy model.")
 
