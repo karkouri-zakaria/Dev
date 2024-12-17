@@ -4,6 +4,7 @@ import streamlit as st
 from gtts import gTTS
 import spacy
 
+# Move st.set_page_config to the very top
 st.set_page_config(layout="wide")
 
 # Function to parse .flashquiz file and extract FrontText and BackText
@@ -52,7 +53,7 @@ def generate_audio(text, file_name="audio.mp3"):
     tts.save(audio_file)
     return audio_file
 
-# Load the German language mode
+# Load the German language model
 try:
     spacy.load("de_core_news_sm")
 except OSError:
@@ -74,7 +75,6 @@ def get_noun_articles(sentence):
 
 
 # Streamlit app
-st.set_page_config(layout="wide")
 st.title('Flashquiz Viewer By Zakaria')
 
 # Sidebar to display the user input
