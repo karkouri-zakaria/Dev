@@ -1,4 +1,3 @@
 gtts
 openpyxl
 spacy
-de-core-news-sm

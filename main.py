@@ -45,9 +45,9 @@ def flashquiz_to_table(file_obj):
 
 # Function to generate audio from text using gTTS
 @st.cache_data
-def generate_audio(text):
+def generate_audio(text, file_name="audio.mp3"):
     tts = gTTS(text=text, lang='de')  # German language
-    audio_file = "audio.mp3"  # Overwrite the same file
+    audio_file = file_name  # Overwrite the same file
     tts.save(audio_file)
     return audio_file
 
@@ -62,8 +62,16 @@ except OSError:
 def get_noun_articles(sentence):
     doc = nlp(sentence)
     articles = {"Fem": "die", "Masc": "der", "Neut": "das"}
-    return [(token.text, articles.get(token.morph.get("Gender")[0], "Unknown")) 
-            for token in doc if token.pos_ == "NOUN"]
+    
+    result = []
+    for token in doc:
+        if token.pos_ == "NOUN":
+            # Get the first gender if available, otherwise assign None
+            article = articles.get(token.morph.get("Gender")[0]) if token.morph.get("Gender") else None
+            if article : result.append((token.text, article))
+    
+    return result
+
 
 # Streamlit app
 st.set_page_config(layout="wide")
@@ -73,7 +81,7 @@ st.title('Flashquiz Viewer By Zakaria')
 user_note = st.sidebar.text_area("Write something", "", key="user_input")
 st.sidebar.write(user_note)
 if user_note:
-    audio_path = generate_audio(user_note)
+    audio_path = generate_audio(user_note, file_name="user_note_audio.mp3")
     with open(audio_path, "rb") as audio_file:
         audio_bytes = audio_file.read()
         st.sidebar.audio(audio_bytes, format="audio/mp3")
@@ -99,7 +107,12 @@ if uploaded_file is not None:
 
         # Create a grid of flashcards
         num_columns = 4
-        st.write(f"Number of flashcards: {len(flashcards_df)}")
+
+        # Create two columns
+        col1, col2 = st.columns(2)
+        col1.write(f"Number of flashcards: {len(flashcards_df)}")
+        col2.write(f"Search filters: {search_query}")
+
         rows = [flashcards_df.iloc[i:i + num_columns] for i in range(0, len(flashcards_df), num_columns)]
 
         for row in rows:
@@ -109,16 +122,18 @@ if uploaded_file is not None:
                     st.write(f"{flashcard['FrontText']}")
 
                     with st.expander("Deutsch⚫🔴🟡"):
-                        st.write(flashcard['BackText'])
-                        
-                        for article, noun in get_noun_articles(flashcard['BackText']):
-                            print(f"{article} {noun}")
+                        st.write(f"{flashcard['BackText']}")
                         try:
                             audio_path = generate_audio(flashcard['BackText'])  # This will cache audio
                             with open(audio_path, "rb") as audio_file:
                                 st.audio(audio_file, format="audio/mp3")
                         except:
-                            st.write("Error generating audio")
+                            st.write("Error generating audio or articles")
+                        try:
+                            for word, article in get_noun_articles(str(flashcard['BackText'])):
+                                st.write(f"{article} {word}")
+                        except:
+                            st.write("Error generating audio or articles")
                     st.write("---")
 
     except Exception as e:
