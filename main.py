@@ -4,6 +4,8 @@ import streamlit as st
 from gtts import gTTS
 import spacy
 
+st.set_page_config(layout="wide")
+
 # Function to parse .flashquiz file and extract FrontText and BackText
 def flashquiz_to_table(file_obj):
     # Read the .flashquiz file content from the file-like object
