@@ -55,7 +55,7 @@ def generate_audio(text, file_name="audio.mp3"):
 
 # Load the German language model
 try:
-    spacy.load("./de_core_news_sm")
+    spacy.load("./de_core_news_sm/de_core_news_sm-3.8.0")
 except OSError:
     st.error("Please restart the app to load the spaCy model.")
 
