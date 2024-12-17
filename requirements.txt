@@ -1,3 +1,5 @@
-gtts
-openpyxl
-spacy
+pandas==2.2.3
+spacy==3.8.3
+de-core-news-sm==3.8.0
+gtts==2.5.4
+openpyxl==3.1.5
