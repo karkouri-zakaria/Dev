@@ -1,4 +1,3 @@
 spacy
 gtts
 openpyxl
-hashlib
